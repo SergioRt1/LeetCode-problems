@@ -23,8 +23,8 @@ func makeTree(root []int, idx int) *TreeNode {
 }
 
 func diameterOfBinaryTree(root *TreeNode) int {
-	path, response := DFS(root)
-	return max(path, response) - 1
+	_, response := DFS(root)
+	return response - 1
 }
 
 func DFS(root *TreeNode) (deepestPath, response int) {
@@ -47,7 +47,7 @@ func max(a, b int) int {
 }
 
 func main() {
-	root := []int{1, 2}
+	root := []int{1, 2, 3, 4, 5}
 	tree := makeTree(root, 0)
 	fmt.Print(diameterOfBinaryTree(tree))
 }
