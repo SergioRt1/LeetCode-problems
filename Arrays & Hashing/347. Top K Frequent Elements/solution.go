@@ -22,7 +22,7 @@ func topKFrequent1(nums []int, k int) []int {
 	return response[:k]
 }
 
-// Use map to count occurrences and then use a list to get the response O(n*k)
+// Use map to count occurrences and then use a list to get the response O(n+k)
 func topKFrequent(nums []int, k int) []int {
 	occurrence := map[int]int{}
 	freq := make([][]int, len(nums)+1)

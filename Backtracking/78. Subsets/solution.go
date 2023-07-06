@@ -23,6 +23,22 @@ func rec(nums []int, idx int) [][]int {
 	return response
 }
 
+func rec2(nums []int) [][]int {
+	response := make([][]int, 0)
+	if len(nums) == 0 {
+		return append(response, []int{})
+	}
+
+	for _, elem := range rec2(nums[1:]) {
+		include := make([]int, len(elem))
+		copy(include, elem)
+		include = append(include, nums[0])
+		response = append(response, elem, include)
+	}
+
+	return response
+}
+
 // Use bit set to decode groups
 func bits(nums []int, idx int) []int {
 	if idx == len(nums) {
