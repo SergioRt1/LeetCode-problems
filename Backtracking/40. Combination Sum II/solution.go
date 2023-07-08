@@ -2,10 +2,50 @@ package main
 
 import (
 	"fmt"
+	"sort"
 )
 
 func combinationSum2(candidates []int, target int) [][]int {
-	return nil
+	sort.Slice(candidates, func(i, j int) bool {
+		return candidates[i] < candidates[j]
+	})
+
+	return recursive(candidates, target, 0)
+}
+
+// Uses backtracking to generate cases it guaranties uniqueness by sorting the input values and skipping all similar values
+// this cases only generate similar cases that generate duplicates, this cut the recursion tree significantly in cases with a lot of equal numbers
+func recursive(candidates []int, target, responseSize int) [][]int {
+	response := make([][]int, 0)
+	if target == 0 {
+		return append(response, make([]int, responseSize))
+	}
+	if len(candidates) == 0 {
+		return response
+	}
+	// decision
+	current := candidates[0]
+	//don't take current value AND escape all similar elements
+	idxNext := findNextDifferent(candidates, current)
+	for _, comb := range recursive(candidates[idxNext:], target, responseSize) {
+		response = append(response, comb)
+	}
+	if newTarget := target - current; newTarget >= 0 {
+		for _, comb := range recursive(candidates[1:], newTarget, responseSize+1) {
+			comb[responseSize] = current
+			response = append(response, comb)
+		}
+	}
+	return response
+}
+
+func findNextDifferent(nums []int, value int) int {
+	for i, n := range nums {
+		if n != value {
+			return i
+		}
+	}
+	return len(nums)
 }
 
 // saves the number of solutions for each [candidates.length][target]
@@ -119,7 +159,7 @@ func findInsertionPoint(list []int, n int) int {
 }
 
 func main() {
-	candidates := []int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+	candidates := []int{10, 1, 2, 7, 6, 1, 5}
 
 	target := 8
 	fmt.Print(combinationSum2(candidates, target))
