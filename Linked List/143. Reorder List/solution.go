@@ -9,6 +9,36 @@ type ListNode struct {
 
 // reorderList takes a head of a liked lists and reorder it L0 → Ln → L1 → Ln - 1 → L2 → Ln - 2 ...
 func reorderList(head *ListNode) {
+	fastSlowIdx(head)
+}
+
+// fastSlowIdx uses two pointers to find the middle node of the list the separate the list in half, reverse the second half and merge the solutions
+func fastSlowIdx(head *ListNode) {
+	slow, fast := head, head
+	for slow != nil && fast != nil && fast.Next != nil {
+		slow = slow.Next
+		fast = fast.Next.Next
+	}
+	// at this point the middle node of the list is slow
+	first := head
+	second := slow.Next
+	slow.Next = nil // cut the list in half, fist = [:slow], second = [slow:]
+
+	// reverse second list
+	var prev *ListNode
+	for second != nil {
+		second.Next, prev, second = prev, second, second.Next
+	}
+	second = prev
+
+	// merge first and second
+	for first != nil && second != nil {
+		first.Next, second.Next, second, first = second, first.Next, second.Next, first.Next
+	}
+}
+
+// arraySolution converts the linked list to an array and then make the reorderList using the array indexes
+func arraySolution(head *ListNode) {
 	if head == nil {
 		return
 	}
@@ -52,7 +82,7 @@ func makeList(list []int, idx int) *ListNode {
 }
 
 func main() {
-	head := makeList([]int{1, 2, 3, 4, 5}, 0)
+	head := makeList([]int{1, 2, 3, 4}, 0)
 	reorderList(head)
 	fmt.Print(head)
 }
