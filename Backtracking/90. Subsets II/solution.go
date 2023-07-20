@@ -10,6 +10,8 @@ func subsetsWithDup(nums []int) [][]int {
 	return r
 }
 
+//TODO use sorting to avoid duplicates
+
 // helper uses a single list and map through the recursion tree to build the answer
 func helper(nums []int) ([][]int, map[int]struct{}) {
 	//base case
