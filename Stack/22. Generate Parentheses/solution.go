@@ -18,11 +18,16 @@ func recursion(leftRemaining, leftAvailable, depth int, stack []byte) []string {
 
 	if leftRemaining > 0 {
 		stack[depth] = '('
-		response = append(response, recursion(leftRemaining-1, leftAvailable+1, depth+1, stack)...)
+		response = recursion(leftRemaining-1, leftAvailable+1, depth+1, stack)
 	}
 	if leftAvailable > 0 {
 		stack[depth] = ')'
-		response = append(response, recursion(leftRemaining, leftAvailable-1, depth+1, stack)...)
+		if combinations := recursion(leftRemaining, leftAvailable-1, depth+1, stack); len(response) == 0 {
+			response = combinations
+		} else {
+			response = append(response, combinations...)
+		}
+
 	}
 
 	return response
