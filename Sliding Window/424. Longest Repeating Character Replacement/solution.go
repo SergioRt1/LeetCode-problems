@@ -15,6 +15,12 @@ type SuperMap struct {
 	maxCountID uint8
 }
 
+func NewSuperMap(size int) *SuperMap {
+	return &SuperMap{
+		data: make(map[uint8]int, size),
+	}
+}
+
 func (s *SuperMap) Increment(id uint8) {
 	s.data[id]++
 	if id == s.maxCountID {
@@ -42,12 +48,9 @@ func (s *SuperMap) Decrement(id uint8) {
 	}
 }
 
+// O(n) solution
 func slidingWindow(s string, k int) int {
-	words := SuperMap{
-		data:       make(map[uint8]int, 26),
-		maxCount:   0,
-		maxCountID: 0,
-	}
+	words := NewSuperMap(26)
 	i := 0
 	best := 0
 	for j := i; j < len(s); j++ {
