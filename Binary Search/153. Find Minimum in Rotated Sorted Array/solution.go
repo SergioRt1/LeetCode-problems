@@ -18,7 +18,23 @@ func findMin(nums []int) int {
 	return min
 }
 
+func findMin2(nums []int) int {
+	lo, hi := 0, len(nums)-1
+	min := nums[hi]
+	for lo < hi {
+		mid := lo + (hi-lo)/2
+		if nums[mid] > nums[hi] { // rotation point on the right side
+			lo = mid + 1
+		} else {
+			min = nums[mid]
+			hi = mid
+		}
+	}
+
+	return min
+}
+
 func main() {
-	nums := []int{1}
-	fmt.Println(findMin(nums))
+	nums := []int{3, 1, 2}
+	fmt.Println(findMin2(nums))
 }
