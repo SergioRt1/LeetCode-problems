@@ -2,28 +2,38 @@ package main
 
 import "fmt"
 
-const (
-	unseen = 0
-	yes    = 1
-	no     = 2
+var (
+	dx = []int{0, -1, 1, 0}
+	dy = []int{-1, 0, 0, 1}
 )
 
-// dont work :S
+type node struct {
+	x int
+	y int
+}
+
+type nothing struct{}
+
 func pacificAtlantic(heights [][]int) [][]int {
-	var response [][]int
-	pacific := make([][]int, len(heights))
-	atlantic := make([][]int, len(heights))
-	visit := make([][]bool, len(heights))
-
-	for i := range heights {
-		pacific[i] = make([]int, len(heights[i]))
-		atlantic[i] = make([]int, len(heights[i]))
-		visit[i] = make([]bool, len(heights[i]))
+	pacific := map[node]nothing{}
+	atlantic := map[node]nothing{}
+	response := make([][]int, 0)
+	m := len(heights)
+	n := len(heights[0])
+	for i := 0; i < m; i++ {
+		dfs(i, 0, heights, pacific)    //left
+		dfs(i, n-1, heights, atlantic) //right
 	}
-
-	for i := range heights {
-		for j := range heights[i] {
-			if p, a := dfs(i, j, heights, pacific, atlantic, visit); p && a {
+	for j := 0; j < n; j++ {
+		dfs(0, j, heights, pacific)    //top
+		dfs(m-1, j, heights, atlantic) //bottom
+	}
+	for i := 0; i < m; i++ {
+		for j := 0; j < n; j++ {
+			current := node{i, j}
+			_, pacificOk := pacific[current]
+			_, atlanticOk := atlantic[current]
+			if pacificOk && atlanticOk {
 				response = append(response, []int{i, j})
 			}
 		}
@@ -32,61 +42,29 @@ func pacificAtlantic(heights [][]int) [][]int {
 	return response
 }
 
-var (
-	dx = []int{0, -1, 1, 0}
-	dy = []int{-1, 0, 0, 1}
-)
-
-func dfs(i, j int, heights, pacific, atlantic [][]int, visit [][]bool) (p, a bool) {
-	if pacific[i][j] != unseen && atlantic[i][j] != unseen {
-		return pacific[i][j] == yes, atlantic[i][j] == yes
-	}
-	visit[i][j] = true
-	for idx := range dx {
-		nI := i + dx[idx]
-		nJ := j + dy[idx]
-		if nI < 0 || nJ < 0 {
-			p = true
-		} else if nI == len(heights) || nJ == len(heights[i]) {
-			a = true
-		} else if heights[i][j] >= heights[nI][nJ] && (!visit[nI][nJ] || (pacific[nI][nJ] != unseen && atlantic[nI][nJ] != unseen)) {
-			sP, sA := dfs(nI, nJ, heights, pacific, atlantic, visit)
-			p = p || sP
-			a = a || sA
-		}
-	}
-	if p {
-		pacific[i][j] = yes
-	} else {
-		pacific[i][j] = no
-	}
-	if a {
-		atlantic[i][j] = yes
-	} else {
-		atlantic[i][j] = no
-	}
-	for idx := range dx {
-		nI := i + dx[idx]
-		nJ := j + dy[idx]
-		if 0 <= nI && nI != len(heights) && 0 <= nJ && nJ != len(heights[i]) &&
-			heights[i][j] == heights[nI][nJ] {
-			if p {
-				pacific[nI][nJ] = yes
-			}
-			if a {
-				atlantic[nI][nJ] = yes
+func dfs(i, j int, heights [][]int, visited map[node]nothing) {
+	currentHeight := heights[i][j]
+	current := node{i, j}
+	visited[current] = nothing{}
+	for d := range dx {
+		x, y := i+dx[d], j+dy[d]
+		if 0 <= x && x < len(heights) && 0 <= y && y < len(heights[0]) {
+			neig := node{x, y}
+			_, vis := visited[neig]
+			if !vis && currentHeight <= heights[x][y] {
+				dfs(x, y, heights, visited)
 			}
 		}
 	}
-
-	return p, a
 }
 
 func main() {
 	h := [][]int{
-		{10, 10, 10},
-		{10, 1, 10},
-		{10, 10, 10},
+		{1, 2, 2, 3, 5},
+		{3, 2, 3, 4, 4},
+		{2, 4, 5, 3, 1},
+		{6, 7, 1, 4, 5},
+		{5, 1, 1, 2, 4},
 	}
 	fmt.Print(pacificAtlantic(h))
 }

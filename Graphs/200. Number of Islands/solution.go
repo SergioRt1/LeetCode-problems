@@ -2,31 +2,55 @@ package main
 
 import "fmt"
 
-// numIslands Use a dfs traversal to mark an entire island of '1' as visited '.', checks all cells in the grid counting the number of islands
+var (
+	dx = []int{-1, 0, 0, 1}
+	dy = []int{0, -1, 1, 0}
+)
+
 func numIslands(grid [][]byte) int {
-	nIslands := 0
+	count := 0
 	for i := range grid {
 		for j := range grid[i] {
 			if grid[i][j] == '1' {
-				nIslands++
-				dfs(grid, i, j)
+				count++
+				dfs(i, j, grid)
 			}
 		}
 	}
-	return nIslands
+
+	return count
 }
 
-var dirI = []int{-1, 0, 0, 1}
-var dirJ = []int{0, -1, 1, 0}
+func dfs(i, j int, grid [][]byte) {
+	grid[i][j] = '.'
+	for d := range dx {
+		x, y := i+dx[d], j+dy[d]
+		if 0 <= x && x < len(grid) && 0 <= y && y < len(grid[0]) && grid[x][y] == '1' {
+			dfs(x, y, grid)
+		}
+	}
+}
 
-func dfs(grid [][]byte, i, j int) {
-	if grid[i][j] == '1' {
-		grid[i][j] = '.'
-		for idx := range dirI {
-			nI := i + dirI[idx]
-			nJ := j + dirJ[idx]
-			if 0 <= nI && nI < len(grid) && 0 <= nJ && nJ < len(grid[i]) {
-				dfs(grid, nI, nJ)
+type Node struct {
+	i int
+	j int
+}
+
+func bfs(n Node, grid [][]byte) {
+	queue := []Node{n}
+
+	for len(queue) > 0 {
+		current := queue[0]
+		queue = queue[1:] // dequeue
+		grid[current.i][current.j] = '.'
+
+		for d := range dx {
+			x, y := current.i+dx[d], current.j+dy[d]
+			if 0 <= x && x < len(grid) && 0 <= y && y < len(grid[0]) && grid[x][y] == '1' {
+				queue = append(queue, Node{
+					i: x,
+					j: y,
+				})
 			}
 		}
 	}
